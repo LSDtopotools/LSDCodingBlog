@@ -13,7 +13,7 @@ locale: en_US
 twitter_username: LSDTopoToolbox
 github_username:  LSDtopotools
 favicon:     "/images/favicon.ico"
-aboutme: Hi, this is Lijia Yu. I made the Freshman21 theme. Please enjoy it. # these are shown on aboutme-sidebar.
+aboutme: This is a blog that has snippets of code and thoughts on software design, written by people who have no training in coding or software design whatsoever. Read these posts at your own risk. The charlatain in chief is Simon M. Mudd # these are shown on aboutme-sidebar.
 aboutme_photo: https://avatars2.githubusercontent.com/u/13199251?v=3&s=200 # your photo.
 
 
@@ -24,7 +24,7 @@ default_locale: "en" # blog sidebar language set, only include: English(en) and 
 
 locales:
     en:
-      Aboutme: "About Me"
+      Aboutme: "About"
       Archives: "Archives"
       Blogroll: "Blogroll"
       Categories: "Categories"
@@ -42,11 +42,11 @@ locales:
 Blogroll:
     - name: LSDTopoTools
       href: http://LSDtopotools.github.io
-      title: Coding notes
-    - name: LSDTopoTools homepage
-      href: http://LSDtopotools.github.io
       title: LSDTopoTools homepage
-
+    - name: Simon Mudd's website
+      href: http://www.geos.ed.ac.uk/homes/smudd
+      title: Simon Mudd's website
+      
 
 ### Build settings
 markdown: kramdown
