@@ -12,10 +12,9 @@ locale: en_US
 ### Personal info and site tools info:
 twitter_username: LSDTopoToolbox
 github_username:  LSDtopotools
-disqus_shortname: freshman21
 favicon:     "/images/favicon.ico"
 aboutme: Hi, this is Lijia Yu. I made the Freshman21 theme. Please enjoy it. # these are shown on aboutme-sidebar.
-aboutme_photo: https://i.imgur.com/Mdc4szJl.jpg # your photo.
+aboutme_photo: https://avatars2.githubusercontent.com/u/13199251?v=3&s=200 # your photo.
 
 
 ### Site setting:
@@ -41,12 +40,12 @@ locales:
 ### your Blogroll info, only name can shown on the page.
 
 Blogroll:
-    - name: Freshman21
-      href: http://yulijia.net/freshman21
-      title: Another Jekyll blog theme
-    - name: author's website
-      href: http://yulijia.net/
-      title: Lijia Yu's website
+    - name: LSDTopoTools
+      href: http://LSDtopotools.github.io
+      title: Coding notes
+    - name: LSDTopoTools homepage
+      href: http://LSDtopotools.github.io
+      title: LSDTopoTools homepage
 
 
 ### Build settings

@@ -6,22 +6,14 @@ permalink: /about/
 ---
 
 
-### Freshman21 is a Jekyll theme.
+### LSDTopoTools coding blog.
 
-A tribute to Twenty Twelve and Twenty eleven.
+Random thoughts and code snippets in c++ and python. 
 
-I like wordpress's theme Twenty Twelve and Twenty eleven very much. 
-So I called my Jekyll theme Freshman21 (Freshman <q>twenty-first</q> , it means twenty-first century, not twenty-one), this theme is based on my former theme [Freshman](https://github.com/yulijia/freshman/).
+This website is based on the [Freshmen21 theme](https://http://jekyllthemes.org/themes/freshman21/) by [Lijia Yu](http://yulijia.net/).
 
-Freshman21 have two main page format, one is [single column](http://yulijia.net/en/  "see demo"), the other is two columns. For more details, please see the articles on the site.
 
-<cite>Proudly enjoy using Freshman21 theme.</cite> <code>;)</code>
-
-<img title="麋鹿" src="https://i.imgur.com/Mdc4szJl.jpg" alt="麋鹿" width="580" height="668" />
-
-#### Hi, the picture you have seen in the sample-page is a Père David's deer photoed by my friend at Beijing Milu Park, China.
-
-Milu(麋鹿) is the chinese name of Père David's deer.
+#### Image in the homepage is a drainage capture site near Sorbas, Spain, analysed with our software. 
 
 
 
