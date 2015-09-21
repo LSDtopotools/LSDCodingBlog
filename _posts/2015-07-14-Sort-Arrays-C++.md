@@ -28,6 +28,3 @@ struct sort_pair_second
 
 std::sort(v.begin(),v.end(), sort_pair_second <int,int>() );
 {% endhighlight %}
-
-{% gist decvalts/f225031d63e9a8f1ba5e %}
-
