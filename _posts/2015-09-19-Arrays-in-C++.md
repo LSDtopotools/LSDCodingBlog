@@ -1,6 +1,7 @@
 ---
-Title: Arrays in C++ with TNT
-Layout: default
+layout: post
+title: Multidimensional Arrays in C++
+tags: arrays, c++
 ---
 
 ## Multidimensional Arrays in C++
