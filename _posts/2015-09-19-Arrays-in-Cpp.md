@@ -21,7 +21,7 @@ C++11 has a new feature in the standard library: `std::array`. Unfortunately it 
 ```cpp
 #include <array>
 
-std::array< std::array<float, 3>, 3 > MyArray  = {{{5, 8, 2}, {8, 3, 1}, {5, 3, 9}}};;
+std::array< std::array<float, 3>, 3 > MyArray  = { { {5, 8, 2}, {8, 3, 1}, {5, 3, 9} } };
 ```
 This is a 3x3 array as we've specified the dimensions in the declaration. We've also intialised the values in the array. Only available with C++11.
 
