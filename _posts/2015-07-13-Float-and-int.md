@@ -1,6 +1,6 @@
 ---
 layout: post
-title: How to set the config.yml file
+title: Floats and Ints in LSDRaster
 modified: 2015-13-07
 categories: [LSDRaster, LSDIndexRaster, data format]
 tags: 
