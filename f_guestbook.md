@@ -1,9 +1,13 @@
 ---
 layout: page
-title: Chumbucket
+title: Useful links
 comments: no
-permalink: /guestbook/
+permalink: /useful_links/
 ---
-## Hi, this is a chumbucket. Place your chum in here
+## Here are some links to our software. 
+
+[LSDTopoTools main page](http://lsdtopotools.github.io/)
+
+## Our motto
 
 "In theory there is no difference between theory and practice. In practice there is." -Yogi Berra
