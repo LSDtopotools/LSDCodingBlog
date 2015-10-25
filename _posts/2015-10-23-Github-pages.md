@@ -33,6 +33,18 @@ I am going to do this with the LSDTT_book repository.
 
 . In the LSDTT_book repoository, make two directories: *master* and *gh-pages*.
 
-. Now clone the main repo
+. Now clone the main repositopry into the *master* repo from the LSDTT_book directory
 
+{% highlight console %}
+$ pwd
+home/Git_projects/LSDTT_book/
+$ git clone https://github.com/LSDtopotools/LSDTT_book.git master
+{% endhighlight %}
 
+. Now cline the repo *AGAIN*, but this time into the gh-pages directory
+
+{% highlight console %}
+$ pwd
+home/Git_projects/LSDTT_book/
+$ git clone https://github.com/LSDtopotools/LSDTT_book.git gh-pages
+{% endhighlight %}
