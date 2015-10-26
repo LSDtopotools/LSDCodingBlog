@@ -60,6 +60,7 @@ $ git git checkout origin/gh-pages -b gh-pages
 3. Now delete the master branch in the gh-pages folder:
 {% highlight console %}
 $ git branch -d master
+{% endhighlight %}
 *This step is mainly to ensure that you don't accidentally commit something to master while you are in the gh-pages directory*. 
 It is not *needed* but is a useful precaution. 
 4. Copy across html and index files every time you build the website. 
