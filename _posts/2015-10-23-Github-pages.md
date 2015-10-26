@@ -1,8 +1,14 @@
 ---
 layout: post
 title: Managing repository websites
+excerpt: "How you manage a project website in GitHub."
+categories: articles
+author: SMM
 tags: git, website
 ---
+
+* Table of Contents
+{:toc}
 
 ## Managing repository pages in Github
 
@@ -28,12 +34,12 @@ You don't want them sitting in the same place!!
 
 We are going to follow the instructions here: https://gist.github.com/chrisjacob/833223
 
-. First, make sure your master branch is up to date on github and then delete it locally. You are going to clone it into a master subdirectory. 
+1. First, make sure your master branch is up to date on github and then delete it locally. You are going to clone it into a master subdirectory. 
 I am going to do this with the LSDTT_book repository. 
 
-. In the LSDTT_book repoository, make two directories: *master* and *gh-pages*.
+2. In the LSDTT_book repoository, make two directories: *master* and *gh-pages*.
 
-. Now clone the main repositopry into the *master* repo from the LSDTT_book directory
+3. Now clone the main repositopry into the *master* repo from the LSDTT_book directory
 
 {% highlight console %}
 $ pwd
@@ -41,7 +47,7 @@ home/Git_projects/LSDTT_book/
 $ git clone https://github.com/LSDtopotools/LSDTT_book.git master
 {% endhighlight %}
 
-. Now cline the repo *AGAIN*, but this time into the gh-pages directory
+4. Now clone the repo *AGAIN*, but this time into the gh-pages directory
 
 {% highlight console %}
 $ pwd
