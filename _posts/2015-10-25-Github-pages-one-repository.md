@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Managing repository websites win the same folder (by SMM)
+title: One folder management (DO NOT TRY) (by SMM)
 excerpt: "How you manage a project website in GitHub--single folder."
 categories: articles
 tags: git, website
