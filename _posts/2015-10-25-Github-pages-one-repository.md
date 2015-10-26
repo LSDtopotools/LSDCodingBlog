@@ -14,6 +14,8 @@ tags: git, website
 In the previous post, I went through a method that involves keeping different directories for the two branches of your code. 
 There is another method for keeping a single directory, which is detailed below. 
 
+WARNING: This method led me down a rabbit hole of many merging conflicts. Keeping two seperate directories is MUCH better!!
+
 ### Setting up a website branch
 
 In guthub, the repository website is always read from a branch called *gh-pages*. 
@@ -37,9 +39,16 @@ $ git git checkout origin/gh-pages -b gh-pages
 {% endhighlight %}
 3. Use the rebase function
 {% highlight console %}
-$ git branch -d master
+$ git branch
+* gh-pages
+master
+$ git rebase master
 {% endhighlight %}
-8. Now you can push changes to your gh-pages branch from this repo without having to check it out each time
-{% highlight console %}
-$ git push -u origin gh-pages. 
-{% endhighlight %}
+4. Push the changes in master to gh-pages (so it keeps up)
+
+### WARNING: This can lead to major merging problems
+
+I don't really like this appraoch since it can lead to horrible merging conflicts if you don't remember to keep rebasing every time. 
+Also when working on windows sometimes you get a merge conflict with Thumbs.db which is very difficult to fix. 
+I would avoid this approach.
+
