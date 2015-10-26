@@ -1,9 +1,8 @@
 ---
 layout: post
-title: Managing repository websites
+title: Managing repository websites without having to checkout the gh-pages branch (by SMM)
 excerpt: "How you manage a project website in GitHub."
 categories: articles
-author: SMM
 tags: git, website
 ---
 
@@ -30,27 +29,38 @@ Making a new branch in the repository is the easy bit!
 ### Setting up your repositories
 
 Once you have created a branch, you need to manage both the master and the gh-pages branches. 
-You don't want them sitting in the same place!!
+You might not want them to sit in the same place.
 
 We are going to follow the instructions here: https://gist.github.com/chrisjacob/833223
 
 1. First, make sure your master branch is up to date on github and then delete it locally. You are going to clone it into a master subdirectory. 
 I am going to do this with the LSDTT_book repository. 
-
-2. In the LSDTT_book repoository, make two directories: *master* and *gh-pages*.
-
-3. Now clone the main repositopry into the *master* repo from the LSDTT_book directory
-
+2. On github, create a gh-pages branc. 
+3. In the LSDTT_book repoository, make two directories: *master* and *gh-pages*.
+4. Now clone the main repository into the *master* repo from the LSDTT_book directory
 {% highlight console %}
 $ pwd
 home/Git_projects/LSDTT_book/
 $ git clone https://github.com/LSDtopotools/LSDTT_book.git master
 {% endhighlight %}
-
-4. Now clone the repo *AGAIN*, but this time into the gh-pages directory
-
+5. Now clone the repo *AGAIN*, but this time into the gh-pages directory
 {% highlight console %}
 $ pwd
 home/Git_projects/LSDTT_book/
 $ git clone https://github.com/LSDtopotools/LSDTT_book.git gh-pages
+{% endhighlight %}
+6. Check out the gh-pages branch
+{% highlight console %}
+$ cd gh-pages
+$ pwd
+home/Git_projects/LSDTT_book/gh-pages
+$ git git checkout origin/gh-pages -b gh-pages
+{% endhighlight %}
+7. Now delete the master branch here:
+{% highlight console %}
+$ git branch -d master
+{% endhighlight %}
+8. Now you can push changes to your gh-pages branch from this repo without having to check it out each time
+{% highlight console %}
+$ git push -u origin gh-pages. 
 {% endhighlight %}

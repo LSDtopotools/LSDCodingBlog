@@ -1,11 +1,9 @@
 ---
 layout: post
-title: Workflow Thoughts with Git
+title: Workflow Thoughts with Git by DAV
 excerpt: "How we work with Github (by DAV)."
-categories: articles
+categories: articles, git
 tags: git, github
-
-author: DAV
 ---
 
 ---
