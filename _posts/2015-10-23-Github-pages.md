@@ -59,6 +59,8 @@ $ git git checkout origin/gh-pages -b gh-pages
 7. Now delete the master branch here:
 {% highlight console %}
 $ git branch -d master
+*This step is mainly to ensure that you don't accidentally commit something to master while you are in the gh-pages directory*. 
+It is not *needed* but is a useful precaution. 
 {% endhighlight %}
 8. Now you can push changes to your gh-pages branch from this repo without having to check it out each time
 {% highlight console %}
