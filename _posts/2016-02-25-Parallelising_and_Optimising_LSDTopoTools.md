@@ -7,9 +7,62 @@ tags: openmp parallelisation hpc
 
 Some notes and experiences from scaling LSDTopoTools code to parallel computing facilities (HPC). I'm using the OpenMP standard, which is widely used and is applicable to all kinds of computing architectures. It will also work on your desktop pc/laptop if you have a multicore CPU.
 
+### Some general thoughts about LSDTopoTools and parallelisation
+
+> Warning: These ideas/ramblings have not been verified by an actual computer scientist...
+
+A lot of the algorithms in LSDTT involve iteration over a loop on elements of an array or 2D matrix. On a high resolution or large DEM this is potentially hundreds of thousands, if not *millions*, of calculations in a single function call. Other algorithms, such as the segment-fitting algorithm, check millions of permuations. I am generalising here, but many of the algorithms' iterations are independent of one another. In other words, you don't always need the answer from the current iteration before you can start the next one. This makes a lot of the analyses ripe for parallelisation. The hillshade algorithm is probably a classic simple example.
+
+{% highlight cpp %}
+    for (int i = 1; i < NRows-1; ++i){
+        for (int j = 1; j < NCols-1; ++j){
+            float slope_rad = 0;
+            float aspect_rad = 0;
+            float dzdx = 0;
+            float dzdy = 0;
+
+            if (RasterData[i][j] != NoDataValue){
+                dzdx = ((RasterData[i][j+1] + 2*RasterData[i+1][j] + RasterData[i+1][j+1]) -
+                       (RasterData[i-1][j-1] + 2*RasterData[i-1][j] + RasterData[i-1][j+1]))
+                        / (8 * DataResolution);
+                dzdy = ((RasterData[i-1][j+1] + 2*RasterData[i][j+1] + RasterData[i+1][j+1]) -
+                       (RasterData[i-1][j-1] + 2*RasterData[i][j-1] + RasterData[i+1][j-1]))
+                       / (8 * DataResolution);
+
+                slope_rad = atan(z_factor * sqrt((dzdx*dzdx) + (dzdy*dzdy)));
+
+                if (dzdx != 0){
+                    aspect_rad = atan2(dzdy, (dzdx*-1));
+                    if (aspect_rad < 0) aspect_rad = 2*M_PI + aspect_rad;
+                }
+                else{
+                    if (dzdy > 0) aspect_rad = M_PI/2;
+                    else if (dzdy < 0) aspect_rad = 2 * M_PI - M_PI/2;
+                    else aspect_rad = aspect_rad;
+                }
+                hillshade[i][j] = 255.0 * ((cos(zenith_rad) * cos(slope_rad)) +
+                                  (sin(zenith_rad) * sin(slope_rad) *
+                                  cos(azimuth_rad - aspect_rad)));
+
+                if (hillshade[i][j] < 0) hillshade[i][j] = 0;
+            }
+        }
+{% endhighlight %}
+
+Basically the algorithm looks around to the cell neighbours and performs some fairly trivial calculation. But none of the calculations depend on the answers from other iterations (Again...I haven't tested this yet, see below for an actual tested and working example). You could probably parallelise this by placing a single statement before the outer `for` loop:
+
+{% highlight cpp %}
+#pragma omp parallel for  // More on this later...
+    for (int i = 1; i < NRows-1; ++i){
+        for (int j = 1; j < NCols-1; ++j){
+        // Do stuff...
+{% endhighlight %}
+
+Finally, most of the computers we use have some multi-core capability. Even your laptop probably has 2 or 4 cores. All this computing power is sitting there waiting to be put to good use! Depending on how parallelisable the algorithm is, you would expect to get something like a 3-3.5x speed up on a 4 core machine compared to running the algorithm in serial. (You rarely get *n* times speed up (where *n* is number of cores) because of overheads, communicating between cores/memory etc.)
+
 ### Identifying hotspots and 'parallelisable' functions
 
-First, profile your code to find where the bottlenecks are. You could use gprof for this. Before you compile the code however, remember to enable the profiling flags `-pg` in the makefile. When you run the compiled code again, you will get the gmon.out file. This contains all the profiling data. To generate some useable output from this, run:
+An example with LSDCatchment model: First, I profiled the code to find where the bottlenecks are. I used gprof for this. Before you compile the code however, remember to enable the profiling flags `-pg` in the makefile. When you run the compiled code again, you will get the gmon.out file. This contains all the profiling data. To generate some useable output from this, run:
 
 {% highlight console %}
 gprof MyLSDExecutable.out gmon.out > analysis.txt
@@ -94,7 +147,13 @@ Where 8 should usually be the same as the number of available cores on your mach
 
 Then just run the executable as normal. You can check the usage of your cpus using the `top` command in linux. Then press 1 to get a breakdown of usage by CPU. You should hopefully see that all of your cpus (cores) are now in use, compared to just one that would have been in use when running the code serially.
 
-(More details to come.)
+### Results from porting to ARCHER
+
+ARCHER is a massive HPC cluster housed in Edinburgh used for academic reserach in the UK. It's made up of a load of compute nodes (2000+ of them). Each node has 2x 12 core processors sharing 64GB of RAM. There is some clever technology called HyperThreading which you can turn on to 'double' the number of logical cores available, giving you a maximum of 48 processing units. (Confusingly, these 48 logical cores are referred to as CPUs, even though they aren't physical CPUs like we might think of normally.)
+
+I did some simulations with LSDCatchmentModel with a variety of core/thread configurations. The test simulation was 48hrs (real time) of the Boscastle storm and flooding in 2004. In serial mode (i.e. no parallelisation) the simulation took around c. 4 hours. With the optimised, parallel code, I could get this down to about 11 minutes in the best case scenario. (Figure to follow) 
+
+More soon...
 
 
 
