@@ -7,59 +7,6 @@ tags: openmp parallelisation hpc
 
 Some notes and experiences from scaling LSDTopoTools code to parallel computing facilities (HPC). I'm using the OpenMP standard, which is widely used and is applicable to all kinds of computing architectures. It will also work on your desktop pc/laptop if you have a multicore CPU.
 
-### Some general thoughts about LSDTopoTools and parallelisation
-
-> Warning: These ideas/ramblings have not been verified by an actual computer scientist...
-
-A lot of the algorithms in LSDTT involve iteration over a loop on elements of an array or 2D matrix. On a high resolution or large DEM this is potentially hundreds of thousands, if not *millions*, of calculations in a single function call. Other algorithms, such as the segment-fitting algorithm, check millions of permuations. I am generalising here, but many of the algorithms' iterations are independent of one another. In other words, you don't always need the answer from the current iteration before you can start the next one. This makes a lot of the analyses ripe for parallelisation. The hillshade algorithm is probably a classic simple example.
-
-{% highlight cpp %}
-    for (int i = 1; i < NRows-1; ++i){
-        for (int j = 1; j < NCols-1; ++j){
-            float slope_rad = 0;
-            float aspect_rad = 0;
-            float dzdx = 0;
-            float dzdy = 0;
-
-            if (RasterData[i][j] != NoDataValue){
-                dzdx = ((RasterData[i][j+1] + 2*RasterData[i+1][j] + RasterData[i+1][j+1]) -
-                       (RasterData[i-1][j-1] + 2*RasterData[i-1][j] + RasterData[i-1][j+1]))
-                        / (8 * DataResolution);
-                dzdy = ((RasterData[i-1][j+1] + 2*RasterData[i][j+1] + RasterData[i+1][j+1]) -
-                       (RasterData[i-1][j-1] + 2*RasterData[i][j-1] + RasterData[i+1][j-1]))
-                       / (8 * DataResolution);
-
-                slope_rad = atan(z_factor * sqrt((dzdx*dzdx) + (dzdy*dzdy)));
-
-                if (dzdx != 0){
-                    aspect_rad = atan2(dzdy, (dzdx*-1));
-                    if (aspect_rad < 0) aspect_rad = 2*M_PI + aspect_rad;
-                }
-                else{
-                    if (dzdy > 0) aspect_rad = M_PI/2;
-                    else if (dzdy < 0) aspect_rad = 2 * M_PI - M_PI/2;
-                    else aspect_rad = aspect_rad;
-                }
-                hillshade[i][j] = 255.0 * ((cos(zenith_rad) * cos(slope_rad)) +
-                                  (sin(zenith_rad) * sin(slope_rad) *
-                                  cos(azimuth_rad - aspect_rad)));
-
-                if (hillshade[i][j] < 0) hillshade[i][j] = 0;
-            }
-        }
-{% endhighlight %}
-
-Basically the algorithm looks around to the cell neighbours and performs some fairly trivial calculation. But none of the calculations depend on the answers from other iterations (Again...I haven't tested this yet, see below for an actual tested and working example). You could probably parallelise this by placing a single statement before the outer `for` loop:
-
-{% highlight cpp %}
-#pragma omp parallel for  // More on this later...
-    for (int i = 1; i < NRows-1; ++i){
-        for (int j = 1; j < NCols-1; ++j){
-        // Do stuff...
-{% endhighlight %}
-
-Finally, most of the computers we use have some multi-core capability. Even your laptop probably has 2 or 4 cores. All this computing power is sitting there waiting to be put to good use! Depending on how parallelisable the algorithm is, you would expect to get something like a 3-3.5x speed up on a 4 core machine compared to running the algorithm in serial. (You rarely get *n* times speed up (where *n* is number of cores) because of overheads, communicating between cores/memory etc.)
-
 ### Identifying hotspots and 'parallelisable' functions
 
 An example with LSDCatchment model: First, I profiled the code to find where the bottlenecks are. I used gprof for this. Before you compile the code however, remember to enable the profiling flags `-pg` in the makefile. When you run the compiled code again, you will get the gmon.out file. This contains all the profiling data. To generate some useable output from this, run:
@@ -124,9 +71,16 @@ Secondly, you need to identify the part of the function that can be parallelised
 
 {% endhighlight %}
 
-When the code runs with OpenMP enabled, the iterations in this loop will be distributed to different threads and cpus. (More on this later). I put in similar `#pragma omp parallel for` lines in the two other expensive functions found by the profiler. You will need to check which loops are suitable for parallelisation (This is the tricky bit - not loop iterations are independent of each other and parallelise easily. It is best to consult a brief tutorial on OpenMP for how to do this, and look at other functioning examples. So I won't go into this in any more details. Here are some useful tutorials:
+When the code runs with OpenMP enabled, the iterations in this loop will be distributed to different threads and cpus. (More on this later). I put in similar `#pragma omp parallel for` lines in the two other expensive functions found by the profiler.
+
+Note that jmax and imax are variables declared out of scope of the for loop. We don't need to worry about them being modified or changing their value since we only check their value. Same for `water_depth[][]` - we are just reading the array, not modifying it. When the parallel region is reached, it is divided up between the number of threads specified before runtime (see later section). Since the value if jmax is known, each thread will perform *jmax/threads* number of iterations. Each thread will have its own private copy of all the variables declared inside the loop. 
+
+What happens at the inner loop? Each thread must carry out the inner loop over its full number of iterations, i.e. *imax*. (There is no further 'nested' parallelism here.) The shared `down_scan[][]` array is modified, but there is no chance of accessing/overwriting the wrong part of the matrix because: 1) the j indices are unique to each outer loop thread - this is taken care of by the `#pragma omp for` statement, and 2) inc is always local to the inner loop iterations, and always starts at 1 in every thread.
+
+Note the variable/incrementer `inc++`. Luckily, `inc` is declared as a local variable inside the outer for loop. I.e. every outer loop iteration starts with a fresh version of `int inc = 1;`. If this was not the case, and inc was a global variable, we would be in trouble - inc could be read and written to by different threads at different times, so the final value could be off. (There is a solution to this using a [reduction](https://computing.llnl.gov/tutorials/openMP/#REDUCTION), but thankfully that is not the case here - although it is a common occurrence). You will need to check which loops are suitable for parallelisation in your own code (This is the tricky bit - not all loop iterations are independent of each other and parallelise easily. It is best to consult a brief tutorial on OpenMP for how to do this, and look at other functioning examples. So I won't go into this in any more details. Here are some useful tutorials:
 
 [Dr Dobbs - Getting Started with OpenMP](http://www.drdobbs.com/getting-started-with-openmp/212501973)
+
 [Lawerence Livermore National Lab - OpenMP tutorial](https://computing.llnl.gov/tutorials/openMP/)
 
 ARCHER (the UK national supercomputing centre) also list details of upcoming training courses, and you can look through their training slides and exercises here:
@@ -156,7 +110,58 @@ I did some simulations with LSDCatchmentModel with a variety of core/thread conf
 More soon...
 
 
+### Some general thoughts about LSDTopoTools and parallelisation
 
+> Warning: These ideas/ramblings have not been verified by an actual computer scientist...
+
+A lot of the algorithms in LSDTT involve iteration over a loop on elements of an array or 2D matrix. On a high resolution or large DEM this is potentially hundreds of thousands, if not *millions*, of calculations in a single function call. Other algorithms, such as the segment-fitting algorithm, check millions of permuations. I am generalising here, but many of the algorithms' iterations are independent of one another. In other words, you don't always need the answer from the current iteration before you can start the next one. This makes a lot of the analyses ripe for parallelisation. The hillshade algorithm is probably a classic simple example.
+
+{% highlight cpp %}
+    for (int i = 1; i < NRows-1; ++i){
+        for (int j = 1; j < NCols-1; ++j){
+            float slope_rad = 0;
+            float aspect_rad = 0;
+            float dzdx = 0;
+            float dzdy = 0;
+
+            if (RasterData[i][j] != NoDataValue){
+                dzdx = ((RasterData[i][j+1] + 2*RasterData[i+1][j] + RasterData[i+1][j+1]) -
+                       (RasterData[i-1][j-1] + 2*RasterData[i-1][j] + RasterData[i-1][j+1]))
+                        / (8 * DataResolution);
+                dzdy = ((RasterData[i-1][j+1] + 2*RasterData[i][j+1] + RasterData[i+1][j+1]) -
+                       (RasterData[i-1][j-1] + 2*RasterData[i][j-1] + RasterData[i+1][j-1]))
+                       / (8 * DataResolution);
+
+                slope_rad = atan(z_factor * sqrt((dzdx*dzdx) + (dzdy*dzdy)));
+
+                if (dzdx != 0){
+                    aspect_rad = atan2(dzdy, (dzdx*-1));
+                    if (aspect_rad < 0) aspect_rad = 2*M_PI + aspect_rad;
+                }
+                else{
+                    if (dzdy > 0) aspect_rad = M_PI/2;
+                    else if (dzdy < 0) aspect_rad = 2 * M_PI - M_PI/2;
+                    else aspect_rad = aspect_rad;
+                }
+                hillshade[i][j] = 255.0 * ((cos(zenith_rad) * cos(slope_rad)) +
+                                  (sin(zenith_rad) * sin(slope_rad) *
+                                  cos(azimuth_rad - aspect_rad)));
+
+                if (hillshade[i][j] < 0) hillshade[i][j] = 0;
+            }
+        }
+{% endhighlight %}
+
+Basically the algorithm looks around to the cell neighbours and performs some fairly trivial calculation. But none of the calculations depend on the answers from other iterations (Again...I haven't tested this yet, see below for an actual tested and working example). You could probably parallelise this by placing a single statement before the outer `for` loop:
+
+{% highlight cpp %}
+#pragma omp parallel for  // More on this later...
+    for (int i = 1; i < NRows-1; ++i){
+        for (int j = 1; j < NCols-1; ++j){
+        // Do stuff...
+{% endhighlight %}
+
+Finally, most of the computers we use have some multi-core capability. Even your laptop probably has 2 or 4 cores. All this computing power is sitting there waiting to be put to good use! Depending on how parallelisable the algorithm is, you would expect to get something like a 3-3.5x speed up on a 4 core machine compared to running the algorithm in serial. (You rarely get *n* times speed up (where *n* is number of cores) because of overheads, communicating between cores/memory etc.)
 
 
 
