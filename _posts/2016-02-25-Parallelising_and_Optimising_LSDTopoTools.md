@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Parallelising and Optimising LSDTopoTools
+title: Parallelising and Optimising LSDTopoTools - DAV
 categories: articles
-tags: openmp, parallelisation, hpc
+tags: openmp parallelisation hpc
 ---
 
 Some notes and experiences from scaling LSDTopoTools code to parallel computing facilities (HPC). I'm using the OpenMP standard, which is widely used and is applicable to all kinds of computing architectures. It will also work on your desktop pc/laptop if you have a multicore CPU.
@@ -51,7 +51,7 @@ Secondly, you need to identify the part of the function that can be parallelised
     {
       // zero scan bit..
       down_scan[j][i] = 0;
-      // and work out scanned area. // TO DO (DAV) there is some out-of-bounds indexing going on here, check carefully!
+      // and work out scanned area by checking the 8 surrounding cells and centre cell.
       if (water_depth[i][j] > 0
           || water_depth[i][j - 1] > 0
           || water_depth[i][j + 1] > 0
@@ -73,12 +73,12 @@ Secondly, you need to identify the part of the function that can be parallelised
 
 When the code runs with OpenMP enabled, the iterations in this loop will be distributed to different threads and cpus. (More on this later). I put in similar `#pragma omp parallel for` lines in the two other expensive functions found by the profiler. You will need to check which loops are suitable for parallelisation (This is the tricky bit - not loop iterations are independent of each other and parallelise easily. It is best to consult a brief tutorial on OpenMP for how to do this, and look at other functioning examples. So I won't go into this in any more details. Here are some useful tutorials:
 
-http://www.drdobbs.com/getting-started-with-openmp/212501973
-https://computing.llnl.gov/tutorials/openMP/
+[Dr Dobbs - Getting Started with OpenMP](http://www.drdobbs.com/getting-started-with-openmp/212501973)
+[Lawerence Livermore National Lab - OpenMP tutorial](https://computing.llnl.gov/tutorials/openMP/)
 
 ARCHER (the UK national supercomputing centre) also list details of upcoming training courses, and you can look through their training slides and exercises here:
 
-http://www.archer.ac.uk/training/course-material/2015/12/ShMem_OpenMP_York/index.php
+[Open MP Tutorial by ARCHER - Course Materials](http://www.archer.ac.uk/training/course-material/2015/12/ShMem_OpenMP_York/index.php)
 
 ### Compiling and running
 
