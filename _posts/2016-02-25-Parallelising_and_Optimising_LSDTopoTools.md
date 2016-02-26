@@ -36,11 +36,11 @@ The analysis tells us that there is one function in this code taking up the bulk
 
 ### Parallelisation
 
-I used the OpenMP library to parallelise the code. OpenMP is a magical set of preprocessor directives that you add to sections of your code to run them in parallel. It does some clever stuff to your code when it compiles. For some light bedtime reading, you could consult the 568-page specification document: http://www.openmp.org/mp-documents/openmp-4.5.pdf.
+I used the OpenMP library to parallelise the code. OpenMP is a magical set of preprocessor directives that you add to sections of your code to run them in parallel. It does some clever stuff to your code when it compiles. For some light bedtime reading, you could consult the [568-page specification document.](http://www.openmp.org/mp-documents/openmp-4.5.pdf)
 
-Firstly, you need to include the `<omp.h>` header file in one of your source files. 
+Okay, now you've read that, you  will know that you need to add the `#include <omp.h>` include file in one of your header or source files. The OpenMP libraries are fairly standard bundles with most compilers. If you have the gcc-devel package installed, you will almost certainly have the OpenMP libraries and thus the `omp.h` header file.
 
-Secondly, you need to identify the part of the function that can be parallelised. I use the `down_scan()` function as a simple example. (qroute() is not so straightforward). This function has a for loop that iterates over every element in a 2D raster matrix. It then checks to see if the water depth  is greater than zero, and sets a value in another array based on this test. This loop is easily parallelisable because the iterations do not depend on each other, and could be calculated in any order. 
+Secondly, you need to identify the part of the function that can be parallelised. I use the `scan_area()` function as a simple example. (`qroute()` is not so straightforward...). This function has a for loop that iterates over every element in a 2D raster matrix. It then checks to see if the water depth  is greater than zero, and sets a value in another array based on this test. This loop is easily parallelisable because the iterations do not depend on each other, and could be calculated in any order. 
 
 {% highlight cpp %}
   #pragma omp parallel for
@@ -77,7 +77,7 @@ Note that jmax and imax are variables declared out of scope of the for loop. We 
 
 What happens at the inner loop? Each thread must carry out the inner loop over its full number of iterations, i.e. *imax*. (There is no further 'nested' parallelism here.) The shared `down_scan[][]` array is modified, but there is no chance of accessing/overwriting the wrong part of the matrix because: 1) the j indices are unique to each outer loop thread - this is taken care of by the `#pragma omp for` statement, and 2) inc is always local to the inner loop iterations, and always starts at 1 in every thread.
 
-Note the variable/incrementer `inc++`. Luckily, `inc` is declared as a local variable inside the outer for loop. I.e. every outer loop iteration starts with a fresh version of `int inc = 1;`. If this was not the case, and inc was a global variable, we would be in trouble - inc could be read and written to by different threads at different times, so the final value could be off. (There is a solution to this using a [reduction](https://computing.llnl.gov/tutorials/openMP/#REDUCTION), but thankfully that is not the case here - although it is a common occurrence). You will need to check which loops are suitable for parallelisation in your own code (This is the tricky bit - not all loop iterations are independent of each other and parallelise easily. It is best to consult a brief tutorial on OpenMP for how to do this, and look at other functioning examples. So I won't go into this in any more details. Here are some useful tutorials:
+Note the variable/incrementer `inc++`. Luckily, `inc` is declared as a local variable inside the outer for loop. I.e. every outer loop iteration starts with a fresh version of `int inc = 1;`. If this was not the case, and inc was a global variable, we would be in trouble - inc could be read and written to by different threads at different times, so the final value could be off. (There is a solution to this using a [reduction](https://computing.llnl.gov/tutorials/openMP/#REDUCTION), but thankfully that is not the case here - although it is a common occurrence). You will need to check which loops are suitable for parallelisation in your own code. This is the tricky bit - not all loop iterations are independent of each other and parallelise so easily. It is best to consult a brief tutorial on OpenMP for how to do this, and look at other functioning examples. So I won't go into this in any more details. Here are some useful tutorials:
 
 [Dr Dobbs - Getting Started with OpenMP](http://www.drdobbs.com/getting-started-with-openmp/212501973)
 
@@ -105,10 +105,23 @@ Then just run the executable as normal. You can check the usage of your cpus usi
 
 ARCHER is a massive HPC cluster housed in Edinburgh used for academic reserach in the UK. It's made up of a load of compute nodes (2000+ of them). Each node has 2x 12 core processors sharing 64GB of RAM. There is some clever technology called HyperThreading which you can turn on to 'double' the number of logical cores available, giving you a maximum of 48 processing units. (Confusingly, these 48 logical cores are referred to as CPUs, even though they aren't physical CPUs like we might think of normally.)
 
-I did some simulations with LSDCatchmentModel with a variety of core/thread configurations. The test simulation was 48hrs (real time) of the Boscastle storm and flooding in 2004. In serial mode (i.e. no parallelisation) the simulation took around c. 4 hours. With the optimised, parallel code, I could get this down to about 11 minutes in the best case scenario. (Figure to follow) 
+I did some simulations with LSDCatchmentModel with a variety of core/thread configurations. The test simulation was 48hrs (real time) of the Boscastle storm and flooding in 2004. In serial mode (i.e. no parallelisation) the simulation took around c. 4 hours. With the optimised, parallel code, I could get this down to about 11 minutes in the best case scenario. 
 
-More soon...
 
+| Cores/CPUs   |Hyperthreading|  OpenMP Threads  |  Time        |
+|-------------:|:------------:|:----------------:|:------------:|
+| 1*           | no           |  1               | c. 4 hours   |
+| 8*           | yes          |  8               | c. 50 mins   |
+| 12           | no           |  12              | 28 mins      |
+| 24           | yes          |  24              | 23 mins      |
+| 24           | no           |  24              | 15 mins      |
+| 48           | yes          |  48              | 11 mins      |
+
+*These 2 simulations were done on a desktop PC with broadly comparable single CPU to the ARCHER nodes, so it's not quite a fair test, but close enough. The rest were done on the standard Archer compute node. 48 cores is the maximum available on a single compute node.
+
+#### Comments on scaling
+
+Linear speed is theoretically possible (i.e. speed up simply a multiplier of the number of processors), but unlikely to happen perfectly in practice. The scaling here is roughly sub linear. Hyper-threading (running in effect two logical cores on a physical core, 'doubling' the number of cpus available) is rarely as effective as true core increases, though the gains are noticeable here. See [Amdahl's Law](https://en.wikipedia.org/wiki/Amdahl%27s_law) if you are really curious about how far this could scale...I think (as a rough guess), it's approaching the region of diminshing returns. Unfortunately I don't have enough CPUs/cores to test it further!
 
 ### Some general thoughts about LSDTopoTools and parallelisation
 
@@ -155,10 +168,10 @@ A lot of the algorithms in LSDTT involve iteration over a loop on elements of an
 Basically the algorithm looks around to the cell neighbours and performs some fairly trivial calculation. But none of the calculations depend on the answers from other iterations (Again...I haven't tested this yet, see below for an actual tested and working example). You could probably parallelise this by placing a single statement before the outer `for` loop:
 
 {% highlight cpp %}
-#pragma omp parallel for  // More on this later...
-    for (int i = 1; i < NRows-1; ++i){
-        for (int j = 1; j < NCols-1; ++j){
-        // Do stuff...
+#pragma omp parallel for
+for (int i = 1; i < NRows-1; ++i){
+    for (int j = 1; j < NCols-1; ++j){
+    // Do stuff...
 {% endhighlight %}
 
 Finally, most of the computers we use have some multi-core capability. Even your laptop probably has 2 or 4 cores. All this computing power is sitting there waiting to be put to good use! Depending on how parallelisable the algorithm is, you would expect to get something like a 3-3.5x speed up on a 4 core machine compared to running the algorithm in serial. (You rarely get *n* times speed up (where *n* is number of cores) because of overheads, communicating between cores/memory etc.)
