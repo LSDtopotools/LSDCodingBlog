@@ -30,7 +30,7 @@ class LSDRaster
   public: 
   // ...
 };
-{% end highlight %}
+{% endhighlight %}
 
 The solutuion to this cyclical problem is to use a forward-declaration of the class LSDRaster in the LSDIndexRaster.hpp file. Forward-declaration just tells the compiler that this class exists -- it doesn't tell the compiler about any of the class details, but it's sufficient for the purposes here. 
 
@@ -48,7 +48,7 @@ class LSDIndexRaster
 
   // etc...
 };
-{% end highlight %}
+{% endhighlight %}
 
 
 
