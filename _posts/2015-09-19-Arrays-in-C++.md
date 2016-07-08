@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Multidimensional Arrays in C++
-tags: arrays, c++
+tags: arrays c++
 ---
 
 ## Multidimensional Arrays in C++

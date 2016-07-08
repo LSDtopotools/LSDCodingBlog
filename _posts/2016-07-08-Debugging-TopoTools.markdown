@@ -2,7 +2,7 @@
 layout: post
 title: Debugging TopoTools
 category: debugging
-tags: debugging, gdb, valgrind
+tags: debugging gdb valgrind
 ---
 
 *DAV - Some notes mainly for my own use - I guess other folk have their favourite debugging methods*
