@@ -2,7 +2,7 @@
 layout: post
 title: Templating the LSDRaster object - DAV
 categories: articles
-tags: LSDRaster, templates
+tags: LSDRaster templates
 ---
 
 *Don't worry, I haven't actually changed LSDRaster in the trunk*

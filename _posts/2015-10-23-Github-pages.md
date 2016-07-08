@@ -3,7 +3,7 @@ layout: post
 title: Managing repository websites without having to checkout the gh-pages branch (by SMM)
 excerpt: "How you manage a project website in GitHub."
 categories: articles
-tags: git, website
+tags: git website
 ---
 
 * Table of Contents

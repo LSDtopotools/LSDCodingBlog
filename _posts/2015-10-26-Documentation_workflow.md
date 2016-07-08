@@ -3,7 +3,7 @@ layout: post
 title: Documentation an gh-pages workflow (by SMM)
 excerpt: "Workflow for managing documentation pages."
 categories: articles
-tags: git, website, gh-pages, documentation
+tags: git website gh-pages documentation
 ---
 
 * Table of Contents

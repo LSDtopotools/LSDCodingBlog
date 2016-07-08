@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Array sorting template C++
-tags: c++, arrays
+tags: c++ arrays
 ---
 In some languages, there is a useful method that will sort the contents of an array based on the order of another:
 

@@ -2,9 +2,8 @@
 layout: post
 title: Floats and Ints in LSDRaster
 modified: 2015-13-07
-categories: [LSDRaster, LSDIndexRaster, data format]
-tags: 
-  - LSDRaster, LSDIndexRaster, data format
+categories: LSDRaster LSDIndexRaster data-format
+tags:  LSDRaster LSDIndexRaster data-format
 comments: true
 ---
 
