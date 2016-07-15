@@ -12,7 +12,7 @@ This unfortunately involves learning some javascript, which is not so easy to de
 
 Here are a few gotchas. 
 
-# If you are working on a local server, you can mix `http` and `https` source files. But if you want to see things on the bl.ocks website, everything needs to be at the same security level.
+1. If you are working on a local server, you can mix `http` and `https` source files. But if you want to see things on the bl.ocks website, everything needs to be at the same security level.
 You browser will not tell you about this problem. I would default to `https`. For leaflet you need:
 
 `https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css`
@@ -25,7 +25,7 @@ whereas D3 is:
 
 `https://d3js.org/d3.v3.min.js`
 
-## Another thing is that you might want to add some leaflet plugins. These are great but you *MUST* add the link to the plugin *AFTER* you have provided the leaflet script, like this:
+2. Another thing is that you might want to add some leaflet plugins. These are great but you *MUST* add the link to the plugin *AFTER* you have provided the leaflet script, like this:
 
 {% highlight html %}
 <!-- Add leaflet ajax for loading geojson --> 
