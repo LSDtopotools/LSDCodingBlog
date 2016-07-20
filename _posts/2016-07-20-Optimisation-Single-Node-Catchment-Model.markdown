@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Optimising LSDCatchmentModel: Part II Larger datasets
+title: Optimising LSDCatchmentModel - Part II Larger datasets
 tags: OpenMP parallelisation HPC LSDCatchmentModel
 ---
 
