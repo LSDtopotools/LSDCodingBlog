@@ -4,7 +4,7 @@ title: LSDCatchmentModel scaling with OpenMP
 tags: LSDCatchmentModel OpenMP HPC
 ---
 
-In an [earlier post]({{ site.baseurl }}{% post_url 2016-02-25-Parallelising_and_Optimising_LSDTopoTools %}), I did a rough, back-of-the-envelope scaling benchmark with some simulations running on a multicore compute-node, including some simulations on my desktop PC. I've revisited this to make the scaling comparisons at bit more consistent (sticking to the compute node CPUs on ARCHER, rather than mixing and matching different hardware). There's also a nice scaling graph, so everyone's happy. Gotta love a good scaling graph.
+In a [previous post]({{ site.baseurl }}{% post_url 2016-02-25-Parallelising_and_Optimising_LSDTopoTools %}), I did a rough, back-of-the-envelope scaling benchmark with some flooding simulations running on a multicore compute-node, including some simulations on my desktop PC. I've revisited this to make the scaling comparisons at bit more consistent (sticking to the compute node CPUs on ARCHER, rather than mixing and matching different hardware). There's also a nice scaling graph, so everyone's happy. Gotta love a good scaling graph.
 
 The simulation is run with the Boscastle catchment in Cornwall, simulating a flood event over 48 hours. ([The devastating flood of 2004.](http://www.metoffice.gov.uk/learning/learn-about-the-weather/weather-phenomena/case-studies/boscastle)) Two sets of simulations are done, one running as a hydrological model only, and the other with erosion and sediment transport switched on, which is generally a bit mode computationally expensive.
 
