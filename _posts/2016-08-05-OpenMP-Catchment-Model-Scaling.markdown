@@ -4,7 +4,7 @@ title: LSDCatchmentModel scaling with OpenMP
 tags: LSDCatchmentModel OpenMP HPC
 ---
 
-In an earlier post, I did a rough, back-of-the-envelope scaling benchmark with some simulations running on a multicore compute-node, including some simulations on my desktop PC. I've revisited this to make the scaling comparisons at bit more consistent (sticking to the compute node CPUs on ARCHER, even for the single thread/core runs). There's also a nice scaling graph, so everyone's happy. Gotta love a good scaling graph.
+In an [earlier post]({% post_url _posts/2016-02-25-Parallelising_and_Optimising_LSDTopoTools %}), I did a rough, back-of-the-envelope scaling benchmark with some simulations running on a multicore compute-node, including some simulations on my desktop PC. I've revisited this to make the scaling comparisons at bit more consistent (sticking to the compute node CPUs on ARCHER, even for the single thread/core runs). There's also a nice scaling graph, so everyone's happy. Gotta love a good scaling graph.
 
 The simulation is with the Boscastle catchment in Cornwall, simulating a flood event over 48 hours. Two sets of simulations are done, one running as a hydrological model only, and the other with erosion and sediment transport switched on, which is generally a bit mode compute intensive.
 
@@ -16,4 +16,4 @@ The actual run times can be compared with the graph below:
 
 ![boscastle_runtime](images/blog_boscastle2.png)
 
-Actual run times with erosion routines on are approaching double that with just the hydrological model, in serial, however as both codes scale up over more CPUs, the gap narrows, relatively speaking. All these simulations are run with around 600000 grid cells (a 5m resolution DEM)
+Actual run times with erosion routines on are approaching double that with just the hydrological model, in serial, however as both codes scale up over more CPUs, the gap narrows, relatively speaking. All these simulations are run with around 600000 grid cells (a 5m resolution DEM). Future work will look at some larger model domains to see how this affects scaling. (Spoiler alert: guess what, it does!)
