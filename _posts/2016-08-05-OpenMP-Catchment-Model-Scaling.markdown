@@ -10,7 +10,7 @@ The simulation is run with the Boscastle catchment in Cornwall, simulating a flo
 
 ![boscastle_speed_up]({{ site.url }}/images/blog_boscastle.png)
 
-As a lot of the code has sections that have to be done serially, there's not a 1:1 scaling of CPUs to speed-up-multiplier, which is to be expected. But I'm quite happy with this for now; if I've got time at some point, I'll delve into OpenMP some more and look for other areas of the code to parallelise. Obviously the simulations with the erosion routines switched on take a lot longer to do: They don't parallelise quite so well, and there's a lot more computation with all the different grain sizes etc. While the hydro model speed up is roughly linear all the way up to around 48 cores (you can just see it tailing off perhaps around 40 cores...) the erosion simulations quite clearly state to tail off around 24 cores onwards.
+As a lot of the code has sections that have to be done serially, there's not a 1:1 scaling of CPUs to speed-up-multiplier, which is to be expected. But I'm quite happy with this for now; if I've got time at some point, I'll delve into OpenMP some more and look for other areas of the code to parallelise. Obviously the simulations with the erosion routines switched on take a lot longer to do: They don't parallelise quite so well, and there's a lot more computation with all the different grain sizes etc. While the hydro model speed up is roughly linear all the way up to around 48 cores (you can just see it tailing off perhaps around 40 cores...) the erosion simulations speed-up clearly starts to tail off around 24 cores upwards.
 
 The actual run times can be compared with the graph below:
 
