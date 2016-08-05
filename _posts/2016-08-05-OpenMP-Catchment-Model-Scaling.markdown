@@ -16,4 +16,4 @@ The actual run times can be compared with the graph below:
 
 ![boscastle_runtime](/images/blog_boscastle2.png)
 
-Actual run times with erosion routines on are approaching double that with just the hydrological model, in serial, however as both codes scale up over more CPUs, the gap narrows, relatively speaking.
+Actual run times with erosion routines on are approaching double that with just the hydrological model, in serial, however as both codes scale up over more CPUs, the gap narrows, relatively speaking. All these simulations are run with around 600000 grid cells (a 5m resolution DEM)
